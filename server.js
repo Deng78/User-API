@@ -21,9 +21,6 @@ db.connection.on('connected', () => console.log(`Database Connected`))
 db.connection.on('error', (err) => console.log(`Error: ${err}`))
 
 // Routes
-app.get('/api/login', (req,res) =>{
-    
-})
 app.post('/api/login', (req,res,next) =>{
     if( req.body.username && req.body.email && req.body.password ){
         const userData = {

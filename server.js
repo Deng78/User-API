@@ -30,7 +30,7 @@ app.post('/api/login', (req,res,next) =>{
         }
         User.authenticate(userData.username, userData.password, (err, user) =>{
             if(err){
-                res.json(err)
+                res.status(err.status).json(err)
             };
             jwt.sign({user}, config.secret, (err, token) =>{
                 res.json({token})
@@ -51,7 +51,7 @@ app.post('/api/signup', (req,res) =>{
           if (err) {
             if (err.code === 11000) {
               // Duplicate username
-              return res.status(500).send({MSG: 'User Already Exist!'});
+              return res.status(403).send({MSG: 'User Already Exist!'});
             }          
             return res.status(500).send(err);
           } else {

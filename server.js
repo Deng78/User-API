@@ -8,60 +8,19 @@ const User = require('./schema.js');
 
 
 const app = express();
+const userRoutes = require('./routes/user');
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/api', userRoutes);
 
 // Connect to DB
-db.connect(config.database, (err, db) =>{
-    if(err){ 
-        throw err
-    }
-})
+db.connect(config.database, (err, db) => {if(err){ throw err }})
 db.connection.on('connected', () => console.log(`Database Connected`))
 db.connection.on('error', (err) => console.log(`Error: ${err}`))
 
-// Routes
-app.post('/api/login', (req,res,next) =>{
-    if( req.body.username && req.body.email && req.body.password ){
-        const userData = {
-          username: req.body.username,
-          email: req.body.email,
-          password: req.body.password,
-        }
-        User.authenticate(userData.username, userData.password, (err, user) =>{
-            if(err){
-                res.status(err.status).json(err)
-            };
-            jwt.sign({user}, config.secret, (err, token) =>{
-                res.json({token})
-            })
-        })
-    }
-})
-app.post('/api/signup', (req,res) =>{
-    res.setHeader('Content-Type', 'application/json');
-    if( req.body.username && req.body.email && req.body.password ){
-        const userData = {
-          username: req.body.username,
-          email: req.body.email,
-          password: req.body.password,
-        }
-        // Insert data to user
-        User.create(userData, function (err, user) {
-          if (err) {
-            if (err.code === 11000) {
-              // Duplicate username
-              return res.status(403).send({MSG: 'User Already Exist!'});
-            }          
-            return res.status(500).send(err);
-          } else {
-              res.send({MSG: 'User Created Successfully'})
-          }
-        });
-    }
-    
-})
-app.post('/user', verifyToken, (req,res) =>{
+// e.g. protected route
+app.get('/user', verifyToken, (req,res) =>{
     jwt.verify(req.token, config.secret, (err, authData) =>{
         if(err){
             res.json(err)
